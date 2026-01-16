@@ -35,11 +35,19 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Generate ECR Password
+        id: ecr-password
+        run: |
+          TOKEN=$(aws ecr get-login-password --region ${{ secrets.AWS_REGION }})
+          echo "::add-mask::$TOKEN"
+          echo "docker_token=$TOKEN" >> $GITHUB_OUT
+
       - name: Build, tag, and push image to Amazon ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: dio-postgres-app-repo
           IMAGE_TAG: ${{ github.sha }}
+          ECR_PASSWORD: ${{ steps.ecr-password.outputs.docker_token }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
@@ -60,16 +68,19 @@ jobs:
             port: 22
             debug: true
             timeout: 30s
+            envs: ECR_REGISTRY,ECR_REPOSITORY,IMAGE_TAG,ECR_PASSWORD
             script: |
               # Login to ECR on the server
-              aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
+              echo $ECR_PASSWORD | docker login --username AWS --password-stdin $ECR_REGISTRY
               
               # Pull the new image
               docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
               
-              # Stop and remove the old container (ignore errors if it doesn't exist)
-              docker stop app-container || true
-              docker rm app-container || true
+              # Remove container antigo se existir
+              if [ "$(docker ps -a -q -f name=app-container)" ]; then
+                docker stop app-container
+                docker rm app-container
+              fi
               
               # Run the new container
               docker run -d \
