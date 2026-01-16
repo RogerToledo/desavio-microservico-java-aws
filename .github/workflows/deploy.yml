@@ -61,6 +61,7 @@ jobs:
           ECR_REPOSITORY: dio-postgres-app-repo
           IMAGE_TAG: ${{ github.sha }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
+          ECR_PASSWORD: ${{ steps.ecr-password.outputs.docker_token }}
         with:
             host: ${{ inputs.server-host }}
             username: ${{ secrets.SERVER_USER }}
