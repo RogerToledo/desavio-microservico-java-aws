@@ -68,7 +68,8 @@ jobs:
             key: ${{ secrets.SERVER_SSH_KEY }}
             port: 22
             debug: true
-            timeout: 30s
+            timeout: 5m
+            script_stop: true
             envs: ECR_REGISTRY,ECR_REPOSITORY,IMAGE_TAG,ECR_PASSWORD
             script: |
               # Login to ECR on the server
