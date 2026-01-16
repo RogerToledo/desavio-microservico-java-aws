@@ -57,6 +57,9 @@ jobs:
             host: ${{ inputs.server-host }}
             username: ${{ secrets.SERVER_USER }}
             key: ${{ secrets.SERVER_SSH_KEY }}
+            port: 22
+            debug: true
+            timeout: 30s
             script: |
               # Login to ECR on the server
               aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
