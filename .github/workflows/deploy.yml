@@ -54,7 +54,7 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
         with:
-            host: ${{ secrets.SERVER_HOST }}
+            host: ${{ inputs.server-host }}
             username: ${{ secrets.SERVER_USER }}
             key: ${{ secrets.SERVER_SSH_KEY }}
             script: |
