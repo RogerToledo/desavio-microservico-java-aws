@@ -94,7 +94,8 @@ jobs:
               docker run -d \
                 --name app-container \
                 -p 8080:8080 \
-                -e SPRING_DATASOURCE_URL=$DB_URL \
-                -e SPRING_DATASOURCE_USERNAME=$DB_USERNAME \
-                -e SPRING_DATASOURCE_PASSWORD=$DB_PASSWORD \
+                -e SPRING_DATASOURCE_URL="$DB_URL" \
+                -e SPRING_DATASOURCE_JDBC_URL="$DB_URL" \
+                -e SPRING_DATASOURCE_USERNAME="$DB_USERNAME" \
+                -e SPRING_DATASOURCE_PASSWORD="$DB_PASSWORD" \
                 $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
