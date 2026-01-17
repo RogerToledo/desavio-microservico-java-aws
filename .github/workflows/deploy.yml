@@ -4,7 +4,10 @@ on:
   workflow_dispatch:
     inputs:
       server-host:
-        description: 'Server Host'
+        description: 'Application Server Host'
+        required: true
+      server-db-host:
+        description: 'DB Server Host'
         required: true
 
 jobs:
@@ -62,6 +65,9 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
           ECR_PASSWORD: ${{ steps.ecr-password.outputs.docker_token }}
+          DB_URL: ${{ inputs.server-db-host }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         with:
             host: ${{ inputs.server-host }}
             username: ${{ secrets.SERVER_USER }}
@@ -70,7 +76,7 @@ jobs:
             debug: true
             timeout: 5m
             script_stop: true
-            envs: ECR_REGISTRY,ECR_REPOSITORY,IMAGE_TAG,ECR_PASSWORD
+            envs: ECR_REGISTRY,ECR_REPOSITORY,IMAGE_TAG,ECR_PASSWORD,DB_URL,DB_USERNAME,DB_PASSWORD
             script: |
               # Login to ECR on the server
               echo $ECR_PASSWORD | docker login --username AWS --password-stdin $ECR_REGISTRY
@@ -88,4 +94,7 @@ jobs:
               docker run -d \
                 --name app-container \
                 -p 8080:8080 \
+                -e SPRING_DATASOURCE_URL=$DB_URL \
+                -e SPRING_DATASOURCE_USERNAME=$DB_USERNAME \
+                -e SPRING_DATASOURCE_PASSWORD=$DB_PASSWORD \
                 $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
