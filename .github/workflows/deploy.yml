@@ -65,7 +65,7 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
           ECR_PASSWORD: ${{ steps.ecr-password.outputs.docker_token }}
-          DB_URL: jdbc:postgresql://${{ inputs.server-db-host }}:5432/marketdb
+          DB_URL: jdbc:postgresql://${{ inputs.server-db-host }}:5432/postgres
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         with:
